@@ -656,15 +656,24 @@ Observe o fluxo de análise:
 do Sul no ano de 2007:
 
 ```{r}
-paises_america_2007 <- gapminder %>%
-  filter(continent == "___", year == ___)
+# dados apenas dos países da América do Sul no ano 2007
+paises_americas_2007 <- gapminder %>%
+  filter(continent == "Americas", year == 2007)
+
+# exibe as primeiras 6 linhas do resultado
+head(paises_americas_2007)
 ```
 
 
 2. Filtre a data frame gapminder para mostrar apenas os dados do Brasil:
 
 ```{r}
-# seu codigo aqui
+# dados apenas sobre o Brasil
+dados_brasil <- gapminder %>%
+  filter(country == "Brazil")
+
+# exibe as primeiras 6 linhas do resultado
+head(dados_brasil)
 ```
 
 
@@ -677,7 +686,14 @@ paises_america_2007 <- gapminder %>%
 - Dados do ano 2007
 
 ```{r}
-# seu codigo aqui
+paises_asia_populosos_2007 <- gapminder %>%
+  filter(continent == "Asia" &
+    pop > 50000000 &
+    year == 2007)
+
+# exibindo todos as observações (linhas)
+# do resultado
+print(paises_asia_populosos_2007, n = Inf)
 ```
 
 
@@ -685,7 +701,16 @@ paises_america_2007 <- gapminder %>%
 mas PIB per capita abaixo de 10.000 dólares em 2007.
 
 ```{r}
-# seu codigo aqui
+paises_desafio <- gapminder %>%
+  filter(
+    lifeExp > 75 &
+      gdpPercap < 10000 &
+      year == 2007
+  )
+
+# exibindo todos as observações (linhas)
+# do resultado
+print(paises_desafio, n = Inf)
 ```
 
 
@@ -851,8 +876,10 @@ paises_classificados
 a população para milhões:
 
 ```{r}
-gapminder %>%
-  mutate(pop_em_milhoes = ___)
+pop_em_milhoes <- gapminder %>%
+  mutate(pop_em_milhoes = pop / 1000000)
+  
+head(pop_em_milhoes)
 ```
 
 
@@ -860,7 +887,11 @@ gapminder %>%
 (PIB per capita × população) para cada país.
 
 ```{r}
-# seu codigo aqui
+dados_pib_total <- gapminder %>%
+  mutate(pib_total = gdpPercap * pop)
+
+# exibe as 6 primeiras linhas de uma df
+head(dados_pib_total)
 ```
 
 
@@ -872,7 +903,11 @@ seja "Sim" quando a população for maior que 50 milhões e "Não"
 caso contrário.
 
 ```{r}
-# seu codigo aqui
+dados_economia_grande <- gapminder %>%
+  mutate(economia_grande = ifelse(pop > 50000000, "Sim", "Não"))
+
+# exibe todas as linhas da df
+print(dados_economia_grande, n = Inf)
 ```
 
 
@@ -884,7 +919,16 @@ os países em três categorias baseadas na expectativa de vida:
 - "Alta": mais de 75 anos
 
 ```{r}
-# seu codigo aqui
+multiplas_categorias <- gapminder %>%
+  filter(year == 2007) %>%
+  mutate(categoria_expectativa = case_when(
+    lifeExp < 60 ~ "Baixa",
+    lifeExp >= 60 & lifeExp <= 75 ~ "Média",
+    lifeExp > 75 ~ "Alta"
+  ))
+
+# exibe todas as linhas da df
+print(multiplas_categorias, n = Inf)
 ```
 
 
