@@ -1021,15 +1021,30 @@ vida por continente:
 
 ```{r}
 expectativa_por_continente <- gapminder %>%
-  group_by(___) %>%
-  summarize(expectativa_media = ___(___))
+  group_by(continent) %>%
+  summarize(
+    expectativa_vida_media = mean(lifeExp),
+    paises_analisados = n()        
+  ) %>%
+  arrange(continent)
+
+expectativa_por_continente %>%
+  head(6)
 ```
 
 
 2. Calcule a população total por continente no ano de 2007.
 
 ```{r}
-# seu codigo aqui
+populacao_continente_2007 <- gapminder %>% 
+  filter(year == 2007) %>%  
+  group_by(continent) %>% 
+  summarise(
+    populaçao_total = sum(pop),
+    paises_analisados = n(),
+  ) %>% 
+  arrange(desc(populaçao_total))
+print(populacao_continente_2007)
 ```
 
 
@@ -1043,7 +1058,15 @@ tabela que mostre, para cada continente:
 - O PIB per capita da melhor "filial" (máximo)
 
 ```{r}
-# seu codigo aqui
+Filiais <- gapminder %>% 
+  group_by(continent) %>% 
+  summarise(
+    Filais = n(),
+    PIB_medio_filiais = mean(gdpPercap),
+    PIB_max_filial = max(gdpPercap)
+  ) %>% 
+  
+  print(filiais)
 ```
 
 
