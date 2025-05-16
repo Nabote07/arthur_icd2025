@@ -34,6 +34,7 @@ options(digits = 3, scipen = 99)
 library(here)
 library(tidyverse)
 library(kableExtra)
+library(readxl)
 ```
 
 
@@ -57,12 +58,12 @@ library(kableExtra)
 # Importa o arquivo de dados
 
 # 1.1 Define o caminho relativo do arquivo em seu projeto RStudio
-caminho_arquivo <- "../../Dados/Brutos/onlineshop.csv"
+caminho_arquivo <- "../Relatorios/Testes/CSV base teste.xlsx"
 
 
 # 1.2 Importa o arquivo com a função read_csv
 
-dados_lojaonline <- read_csv(caminho_arquivo)
+  exames_df <- read_excel("CSV base teste.xlsx")
 
 
 ```
