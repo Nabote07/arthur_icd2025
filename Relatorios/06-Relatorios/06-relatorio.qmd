@@ -2,7 +2,7 @@
 title: "Organização de Dados com o Pacote tidyr"
 subtitle: "Continuação do Relatório 5"
 lang: pt-BR
-author: "Seu Nome"
+author: "Arthur Henrique"
 date: 2025-05-09
 format: 
   html:
@@ -411,13 +411,13 @@ data frame **dados_vendas_longo**.
 de vendas por categoria e ordene do maior para o menor.
 
 ```{r}
-# Transforma os dados para o formato longo
-vendas_medias_categoria <- dados_vendas_longo %>%
-  group_by(categoria) %>% 
-  summarise(vendas_medias = mean(valor_vendas)) %>% 
-  arrange(desc(vendas_medias))
-    # Visualiza o resultado
-vendas_medias_categoria
+vendas_totais_categoria <- dados_vendas_longo %>%
+  group_by(categoria) %>%
+  summarize(vendas_media = mean(valor_vendas)) %>%
+  arrange(desc(vendas_media))
+
+# visualiza o resultado
+vendas_totais_categoria
 ```
 
 
@@ -430,12 +430,13 @@ da categoria "Mobiliário" e mostre as vendas totais de cada produto
 desta categoria, ordenando do maior para o menor.
 
 ```{r}
-vendas_mobiliario <- dados_vendas_longo %>% 
-  filter(categoria == "Mobiliário") %>% 
-  group_by(produto) %>% 
-  summarize(vendas_totais = sum(valor_vendas)) %>% 
+vendas_mobiliario <- dados_vendas_longo %>%
+  filter(categoria == "Mobiliário") %>%
+  group_by(produto) %>%
+  summarize(vendas_totais = sum(valor_vendas)) %>%
   arrange(desc(vendas_totais))
 
+# visualiza o resultado
 vendas_mobiliario
 ```
 
@@ -449,17 +450,24 @@ valor mínimo e o valor máximo para cada categoria, ordenando do maior
 para o menor valor total.
 
 ```{r}
-valor_total_vendas <- dados_vendas_longo %>% 
-  groupby(categoria) %>% 
-  summarise(
-    vendas_totais = sum(vendas_mensais),
+# Calcula o total mensal por categoria
+vendas_mensais_categoria <- dados_vendas_longo %>%
+  group_by(categoria, mes) %>%
+  summarize(vendas_mensais = sum(valor_vendas), .groups = "drop")
+
+# Calcula os indicadores por categoria
+desempenho_categoria <- vendas_mensais_categoria %>%
+  group_by(categoria) %>%
+  summarize(
+    total_vendas = sum(vendas_mensais),
     media_mensal = mean(vendas_mensais),
-    valor_minimo = min(vendas_mensais),
-    valor_maximo = max(vendas_mensais)
-  ) %>% 
+    minimo_mensal = min(vendas_mensais),
+    maximo_mensal = max(vendas_mensais)
+  ) %>%
   arrange(desc(total_vendas))
 
-valor_total_vendas
+# Visualiza o resultado
+desempenho_categoria
 ```
 
 

@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Arthur Henrique">
+
+<title>Organização de Dados com o Pacote tidyr</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="07-relatorio_files/libs/clipboard/clipboard.min.js"></script>
+<script src="07-relatorio_files/libs/quarto-html/quarto.js"></script>
+<script src="07-relatorio_files/libs/quarto-html/popper.min.js"></script>
+<script src="07-relatorio_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="07-relatorio_files/libs/quarto-html/anchor.min.js"></script>
+<link href="07-relatorio_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="07-relatorio_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="07-relatorio_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="07-relatorio_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="07-relatorio_files/libs/bootstrap/bootstrap-0b3b9638000aa634054a1a0e4b24ad6b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul>
+  <li><a href="#pacote-dplyr-tipos-básicos-de-joins" id="toc-pacote-dplyr-tipos-básicos-de-joins" class="nav-link active" data-scroll-target="#pacote-dplyr-tipos-básicos-de-joins"><span class="header-section-number">1</span> Pacote dplyr: Tipos Básicos de <em>joins</em></a>
+  <ul class="collapse">
+  <li><a href="#joins-no-dplyr" id="toc-joins-no-dplyr" class="nav-link" data-scroll-target="#joins-no-dplyr"><span class="header-section-number">1.1</span> Joins no dplyr</a></li>
+  <li><a href="#tabela-produtos" id="toc-tabela-produtos" class="nav-link" data-scroll-target="#tabela-produtos"><span class="header-section-number">1.2</span> Tabela produtos</a></li>
+  <li><a href="#tabela-vendas" id="toc-tabela-vendas" class="nav-link" data-scroll-target="#tabela-vendas"><span class="header-section-number">1.3</span> Tabela vendas</a></li>
+  <li><a href="#tabela-clientes" id="toc-tabela-clientes" class="nav-link" data-scroll-target="#tabela-clientes"><span class="header-section-number">1.4</span> Tabela Clientes</a></li>
+  <li><a href="#dados-de-exemplo-para-aula" id="toc-dados-de-exemplo-para-aula" class="nav-link" data-scroll-target="#dados-de-exemplo-para-aula"><span class="header-section-number">1.5</span> Dados de Exemplo para Aula</a></li>
+  <li><a href="#exemplo-left-join" id="toc-exemplo-left-join" class="nav-link" data-scroll-target="#exemplo-left-join"><span class="header-section-number">1.6</span> Exemplo: Left Join</a></li>
+  <li><a href="#exemplo-inner-join" id="toc-exemplo-inner-join" class="nav-link" data-scroll-target="#exemplo-inner-join"><span class="header-section-number">1.7</span> Exemplo: Inner Join</a></li>
+  <li><a href="#exemplo-full-join" id="toc-exemplo-full-join" class="nav-link" data-scroll-target="#exemplo-full-join"><span class="header-section-number">1.8</span> Exemplo: Full Join</a></li>
+  <li><a href="#exemplo-right-join" id="toc-exemplo-right-join" class="nav-link" data-scroll-target="#exemplo-right-join"><span class="header-section-number">1.9</span> Exemplo: Right Join</a></li>
+  <li><a href="#exemplo-combinando-três-tabelas" id="toc-exemplo-combinando-três-tabelas" class="nav-link" data-scroll-target="#exemplo-combinando-três-tabelas"><span class="header-section-number">1.10</span> Exemplo: Combinando Três Tabelas</a></li>
+  <li><a href="#o-desafio-dos-sistemas-reais" id="toc-o-desafio-dos-sistemas-reais" class="nav-link" data-scroll-target="#o-desafio-dos-sistemas-reais"><span class="header-section-number">1.11</span> O Desafio dos Sistemas Reais</a></li>
+  <li><a href="#exercício-1" id="toc-exercício-1" class="nav-link" data-scroll-target="#exercício-1"><span class="header-section-number">1.12</span> Exercício 1</a></li>
+  <li><a href="#exercício-2" id="toc-exercício-2" class="nav-link" data-scroll-target="#exercício-2"><span class="header-section-number">1.13</span> Exercício 2</a></li>
+  <li><a href="#exercício-3" id="toc-exercício-3" class="nav-link" data-scroll-target="#exercício-3"><span class="header-section-number">1.14</span> Exercício 3</a></li>
+  <li><a href="#exercício-4" id="toc-exercício-4" class="nav-link" data-scroll-target="#exercício-4"><span class="header-section-number">1.15</span> Exercício 4</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Organização de Dados com o Pacote tidyr</h1>
+<p class="subtitle lead">Tipos Básicos de <em>joins</em> do Pacote dplyr</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor</div>
+    <div class="quarto-title-meta-contents">
+             <p>Arthur Henrique </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Data de Publicação</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">16 de maio de 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="pacote-dplyr-tipos-básicos-de-joins" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Pacote dplyr: Tipos Básicos de <em>joins</em></h1>
+<section id="joins-no-dplyr" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="joins-no-dplyr"><span class="header-section-number">1.1</span> Joins no dplyr</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+O que são joins?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p><strong>Joins</strong> são operações que combinam duas tabelas de dados</p></li>
+<li><p>Em termos simples, joins são como “colar” duas tabelas lado a lado, combinando linhas que têm valores em comum, como um “código de cliente” ou “código de produto”</p></li>
+<li><p>No pacote dplyr, temos funções específicas para cada tipo de join:</p>
+<ul>
+<li><code>left_join()</code>: Mantém todas as linhas da tabela da esquerda</li>
+<li><code>inner_join()</code>: Mantém apenas correspondências entre as tabelas</li>
+<li><code>full_join()</code>: Mantém todas as linhas de ambas as tabelas</li>
+<li><code>right_join()</code>: Mantém todas as linhas da tabela da direita</li>
+</ul></li>
+<li><p>São essenciais quando precisamos combinar informações que estão separadas</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="tabela-produtos" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="tabela-produtos"><span class="header-section-number">1.2</span> Tabela produtos</h2>
+<div class="cell" style="font-size: 1.3em;">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria a tabela de produtos</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>produtos <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>codigo_produto, <span class="sc">~</span>nome_produto,      <span class="sc">~</span>preco_unitario, <span class="sc">~</span>categoria,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"P001"</span>,         <span class="st">"Notebook Pro"</span>,      <span class="dv">4500</span>,           <span class="st">"Eletrônicos"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"P002"</span>,         <span class="st">"Smartphone X"</span>,      <span class="dv">2800</span>,           <span class="st">"Eletrônicos"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"P003"</span>,         <span class="st">"Monitor 24pol"</span>,     <span class="dv">1200</span>,           <span class="st">"Informática"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"P004"</span>,         <span class="st">"Mouse Gamer"</span>,       <span class="dv">250</span>,            <span class="st">"Informática"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"P005"</span>,         <span class="st">"Cadeira Ergonômica"</span>, <span class="dv">950</span>,           <span class="st">"Mobiliário"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># exibe a tabela</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>produtos</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  codigo_produto nome_produto       preco_unitario categoria  
+  &lt;chr&gt;          &lt;chr&gt;                       &lt;dbl&gt; &lt;chr&gt;      
+1 P001           Notebook Pro                 4500 Eletrônicos
+2 P002           Smartphone X                 2800 Eletrônicos
+3 P003           Monitor 24pol                1200 Informática
+4 P004           Mouse Gamer                   250 Informática
+5 P005           Cadeira Ergonômica            950 Mobiliário </code></pre>
+</div>
+</div>
+<p>:::</p>
+</section>
+<section id="tabela-vendas" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="tabela-vendas"><span class="header-section-number">1.3</span> Tabela vendas</h2>
+<div class="cell" style="font-size: 1.3em;">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria a tabela de vendas</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>vendas <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>id_venda, <span class="sc">~</span>codigo_produto, <span class="sc">~</span>id_cliente, <span class="sc">~</span>data_venda,  <span class="sc">~</span>quantidade,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span>,         <span class="st">"P001"</span>,          <span class="st">"C001"</span>,      <span class="st">"2025-04-15"</span>, <span class="dv">1</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span>,         <span class="st">"P002"</span>,          <span class="st">"C002"</span>,      <span class="st">"2025-04-16"</span>, <span class="dv">2</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">3</span>,         <span class="st">"P003"</span>,          <span class="st">"C001"</span>,      <span class="st">"2025-04-18"</span>, <span class="dv">2</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="dv">4</span>,         <span class="st">"P002"</span>,          <span class="st">"C003"</span>,      <span class="st">"2025-04-20"</span>, <span class="dv">1</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">5</span>,         <span class="st">"P006"</span>,          <span class="st">"C002"</span>,      <span class="st">"2025-04-22"</span>, <span class="dv">3</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="dv">6</span>,         <span class="st">"P004"</span>,          <span class="st">"C004"</span>,      <span class="st">"2025-04-23"</span>, <span class="dv">4</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># exibe a tabela</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>vendas</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  id_venda codigo_produto id_cliente data_venda quantidade
+     &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt;
+1        1 P001           C001       2025-04-15          1
+2        2 P002           C002       2025-04-16          2
+3        3 P003           C001       2025-04-18          2
+4        4 P002           C003       2025-04-20          1
+5        5 P006           C002       2025-04-22          3
+6        6 P004           C004       2025-04-23          4</code></pre>
+</div>
+</div>
+</section>
+<section id="tabela-clientes" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="tabela-clientes"><span class="header-section-number">1.4</span> Tabela Clientes</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria a tabela de clientes </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>clientes <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>id_cliente, <span class="sc">~</span>nome_cliente,     <span class="sc">~</span>cidade,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"C001"</span>,      <span class="st">"Empresa Alpha"</span>,   <span class="st">"São Paulo"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"C002"</span>,      <span class="st">"Empresa Beta"</span>,    <span class="st">"Rio de Janeiro"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"C003"</span>,      <span class="st">"João Silva"</span>,      <span class="st">"Belo Horizonte"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"C005"</span>,      <span class="st">"Maria Oliveira"</span>,  <span class="st">"Recife"</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># exibe a tabela</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>clientes</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  id_cliente nome_cliente   cidade        
+  &lt;chr&gt;      &lt;chr&gt;          &lt;chr&gt;         
+1 C001       Empresa Alpha  São Paulo     
+2 C002       Empresa Beta   Rio de Janeiro
+3 C003       João Silva     Belo Horizonte
+4 C005       Maria Oliveira Recife        </code></pre>
+</div>
+</div>
+</section>
+<section id="dados-de-exemplo-para-aula" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="dados-de-exemplo-para-aula"><span class="header-section-number">1.5</span> Dados de Exemplo para Aula</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>produtos</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  codigo_produto nome_produto       preco_unitario categoria  
+  &lt;chr&gt;          &lt;chr&gt;                       &lt;dbl&gt; &lt;chr&gt;      
+1 P001           Notebook Pro                 4500 Eletrônicos
+2 P002           Smartphone X                 2800 Eletrônicos
+3 P003           Monitor 24pol                1200 Informática
+4 P004           Mouse Gamer                   250 Informática
+5 P005           Cadeira Ergonômica            950 Mobiliário </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>vendas</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  id_venda codigo_produto id_cliente data_venda quantidade
+     &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt;
+1        1 P001           C001       2025-04-15          1
+2        2 P002           C002       2025-04-16          2
+3        3 P003           C001       2025-04-18          2
+4        4 P002           C003       2025-04-20          1
+5        5 P006           C002       2025-04-22          3
+6        6 P004           C004       2025-04-23          4</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>clientes</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  id_cliente nome_cliente   cidade        
+  &lt;chr&gt;      &lt;chr&gt;          &lt;chr&gt;         
+1 C001       Empresa Alpha  São Paulo     
+2 C002       Empresa Beta   Rio de Janeiro
+3 C003       João Silva     Belo Horizonte
+4 C005       Maria Oliveira Recife        </code></pre>
+</div>
+</div>
+<p><strong>Observe que há dados “imperfeitos”</strong>:</p>
+<ul>
+<li>Produto “P006” está nas vendas, mas não na tabela de produtos</li>
+<li>Cliente “C004” está nas vendas, mas não na tabela de clientes</li>
+<li>Cliente “C005” está na tabela de clientes, mas não tem vendas</li>
+</ul>
+</section>
+<section id="exemplo-left-join" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="exemplo-left-join"><span class="header-section-number">1.6</span> Exemplo: Left Join</h2>
+<p>Left Join entre Vendas e Produtos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Left join: todas as vendas, mesmo sem correspondência na tabela de produtos</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 1: Pegamos a tabela 'vendas' </span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 2: Mantemos TODAS as vendas e adicionamos dados de produtos quando existirem</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>vendas_produtos_left <span class="ot">&lt;-</span> vendas <span class="sc">%&gt;%</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(produtos, <span class="at">by =</span> <span class="st">"codigo_produto"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizando o resultado</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>vendas_produtos_left</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 8
+  id_venda codigo_produto id_cliente data_venda quantidade nome_produto 
+     &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;        
+1        1 P001           C001       2025-04-15          1 Notebook Pro 
+2        2 P002           C002       2025-04-16          2 Smartphone X 
+3        3 P003           C001       2025-04-18          2 Monitor 24pol
+4        4 P002           C003       2025-04-20          1 Smartphone X 
+5        5 P006           C002       2025-04-22          3 &lt;NA&gt;         
+6        6 P004           C004       2025-04-23          4 Mouse Gamer  
+# ℹ 2 more variables: preco_unitario &lt;dbl&gt;, categoria &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p><strong>Observe que</strong>:</p>
+<ul>
+<li><p>Agora a venda do produto “P006” (id_venda 5) <strong>aparece</strong> no resultado</p></li>
+<li><p>Como esse produto não existe na tabela de produtos, a coluna de produtos contém NA</p></li>
+<li><p>O left_join é o join mais comum - preserva todos os registros da tabela principal</p></li>
+</ul>
+</section>
+<section id="exemplo-inner-join" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="exemplo-inner-join"><span class="header-section-number">1.7</span> Exemplo: Inner Join</h2>
+<p>Inner Join entre Vendas e Produtos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inner join: apenas vendas de produtos que existem no cadastro</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 1: Pegamos a tabela 'vendas'</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 2: Combinamos com a tabela 'produtos' usando codigo_produto</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>vendas_produtos <span class="ot">&lt;-</span> vendas <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(produtos, <span class="at">by =</span> <span class="st">"codigo_produto"</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizando o resultado</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>vendas_produtos</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 8
+  id_venda codigo_produto id_cliente data_venda quantidade nome_produto 
+     &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;        
+1        1 P001           C001       2025-04-15          1 Notebook Pro 
+2        2 P002           C002       2025-04-16          2 Smartphone X 
+3        3 P003           C001       2025-04-18          2 Monitor 24pol
+4        4 P002           C003       2025-04-20          1 Smartphone X 
+5        6 P004           C004       2025-04-23          4 Mouse Gamer  
+# ℹ 2 more variables: preco_unitario &lt;dbl&gt;, categoria &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p><strong>Observe que</strong>:</p>
+<ul>
+<li>A venda do produto “P006” (id_venda 5) <strong>não aparece</strong> no resultado</li>
+<li>Isso acontece porque esse produto não existe na tabela de produtos</li>
+<li>O inner_join mantém apenas as vendas de produtos que existem no cadastro</li>
+</ul>
+</section>
+<section id="exemplo-full-join" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="exemplo-full-join"><span class="header-section-number">1.8</span> Exemplo: Full Join</h2>
+<p>Full Join entre Vendas e Produtos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Full join: todas as vendas e todos os produtos</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 1: Pegamos a tabela 'vendas'</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 2: Combinamos com produtos mantendo TUDO de ambas as tabelas</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>completo_vendas_produtos <span class="ot">&lt;-</span> vendas <span class="sc">%&gt;%</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(produtos, <span class="at">by =</span> <span class="st">"codigo_produto"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizando o resultado</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>completo_vendas_produtos</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 8
+  id_venda codigo_produto id_cliente data_venda quantidade nome_produto      
+     &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;             
+1        1 P001           C001       2025-04-15          1 Notebook Pro      
+2        2 P002           C002       2025-04-16          2 Smartphone X      
+3        3 P003           C001       2025-04-18          2 Monitor 24pol     
+4        4 P002           C003       2025-04-20          1 Smartphone X      
+5        5 P006           C002       2025-04-22          3 &lt;NA&gt;              
+6        6 P004           C004       2025-04-23          4 Mouse Gamer       
+7       NA P005           &lt;NA&gt;       &lt;NA&gt;               NA Cadeira Ergonômica
+# ℹ 2 more variables: preco_unitario &lt;dbl&gt;, categoria &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p><strong>Observe que</strong>:</p>
+<ul>
+<li><p>A venda do produto “P006” que não existe na tabela de produtos aparece com NAs</p></li>
+<li><p>O produto “P005” que não tem vendas também aparece com NAs</p></li>
+<li><p>O full_join é útil para ver “tudo junto” e identificar inconsistências</p></li>
+</ul>
+</section>
+<section id="exemplo-right-join" class="level2" data-number="1.9">
+<h2 data-number="1.9" class="anchored" data-anchor-id="exemplo-right-join"><span class="header-section-number">1.9</span> Exemplo: Right Join</h2>
+<p>Right Join entre Vendas e Produtos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Right join: todos os produtos, mesmo sem vendas</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 1: Pegamos a tabela 'vendas'</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 2: Combinamos com TODOS os produtos, mesmo os sem vendas</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>produtos_vendas_right <span class="ot">&lt;-</span> vendas <span class="sc">%&gt;%</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(produtos, <span class="at">by =</span> <span class="st">"codigo_produto"</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizando o resultado</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>produtos_vendas_right</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 8
+  id_venda codigo_produto id_cliente data_venda quantidade nome_produto      
+     &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;             
+1        1 P001           C001       2025-04-15          1 Notebook Pro      
+2        2 P002           C002       2025-04-16          2 Smartphone X      
+3        3 P003           C001       2025-04-18          2 Monitor 24pol     
+4        4 P002           C003       2025-04-20          1 Smartphone X      
+5        6 P004           C004       2025-04-23          4 Mouse Gamer       
+6       NA P005           &lt;NA&gt;       &lt;NA&gt;               NA Cadeira Ergonômica
+# ℹ 2 more variables: preco_unitario &lt;dbl&gt;, categoria &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p><strong>Observe que</strong>:</p>
+<ul>
+<li>Agora o produto “P005” (Cadeira Ergonômica) <strong>aparece</strong> no resultado</li>
+<li>Como esse produto não tem vendas, as colunas de vendas aparecem com NA</li>
+<li>O right_join é útil para identificar produtos sem movimento</li>
+</ul>
+</section>
+<section id="exemplo-combinando-três-tabelas" class="level2" data-number="1.10">
+<h2 data-number="1.10" class="anchored" data-anchor-id="exemplo-combinando-três-tabelas"><span class="header-section-number">1.10</span> Exemplo: Combinando Três Tabelas</h2>
+<p>Combinando vendas, produtos e clientes:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 1: Combinamos vendas com produtos</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Passo 2: Depois combinamos o resultado com clientes</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>relatorio_completo <span class="ot">&lt;-</span> vendas <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Primeiro, adicionamos informações de produtos</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(produtos, <span class="at">by =</span> <span class="st">"codigo_produto"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Depois, adicionamos informações de clientes</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(clientes, <span class="at">by =</span> <span class="st">"id_cliente"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Selecionamos apenas as colunas mais importantes para o relatório</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    id_venda, data_venda, </span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    id_cliente, nome_cliente, cidade,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    codigo_produto, nome_produto, </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    quantidade, preco_unitario</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizando o resultado</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(relatorio_completo, <span class="at">n =</span> <span class="cn">Inf</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  id_venda data_venda id_cliente nome_cliente cidade codigo_produto nome_produto
+     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;        &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;       
+1        1 2025-04-15 C001       Empresa Alp… São P… P001           Notebook Pro
+2        2 2025-04-16 C002       Empresa Beta Rio d… P002           Smartphone X
+3        3 2025-04-18 C001       Empresa Alp… São P… P003           Monitor 24p…
+4        4 2025-04-20 C003       João Silva   Belo … P002           Smartphone X
+5        5 2025-04-22 C002       Empresa Beta Rio d… P006           &lt;NA&gt;        
+6        6 2025-04-23 C004       &lt;NA&gt;         &lt;NA&gt;   P004           Mouse Gamer 
+# ℹ 2 more variables: quantidade &lt;dbl&gt;, preco_unitario &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p><strong>Observe como</strong>:</p>
+<ul>
+<li>Combinamos três tabelas em sequência</li>
+<li>Usamos left_join para manter todas as vendas</li>
+<li>Algumas informações têm NA quando não há correspondência</li>
+</ul>
+</section>
+<section id="o-desafio-dos-sistemas-reais" class="level2" data-number="1.11">
+<h2 data-number="1.11" class="anchored" data-anchor-id="o-desafio-dos-sistemas-reais"><span class="header-section-number">1.11</span> O Desafio dos Sistemas Reais</h2>
+<p>Exemplo - Relatório de Vendas Integrado</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sistema de Cadastro de Produtos (departamento de Compras)</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>produtos_cadastro <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>codigo,       <span class="sc">~</span>descricao,        <span class="sc">~</span>valor_unitario, <span class="sc">~</span>categoria,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"P001"</span>,        <span class="st">"Notebook Pro"</span>,     <span class="dv">4500</span>,           <span class="st">"Eletrônicos"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"P002"</span>,        <span class="st">"Smartphone X"</span>,     <span class="dv">2800</span>,           <span class="st">"Eletrônicos"</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"P003"</span>,        <span class="st">"Monitor 24pol"</span>,    <span class="dv">1200</span>,           <span class="st">"Informática"</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Sistema de Vendas (departamento Comercial)</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>vendas_sistema <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>id_venda, <span class="sc">~</span>cod_produto, <span class="sc">~</span>data_venda,  <span class="sc">~</span>qtd,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span>,         <span class="st">"P001"</span>,       <span class="st">"2025-04-15"</span>, <span class="dv">1</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span>,         <span class="st">"P002"</span>,       <span class="st">"2025-04-16"</span>, <span class="dv">2</span>,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="dv">3</span>,         <span class="st">"P003"</span>,       <span class="st">"2025-04-18"</span>, <span class="dv">2</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Integrando os sistemas com diferentes nomenclaturas</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>relatorio_vendas <span class="ot">&lt;-</span> vendas_sistema <span class="sc">%&gt;%</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(produtos_cadastro, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"cod_produto"</span> <span class="ot">=</span> <span class="st">"codigo"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id_venda, data_venda, cod_produto, descricao, qtd, valor_unitario) <span class="sc">%&gt;%</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">valor_total =</span> qtd <span class="sc">*</span> valor_unitario) <span class="sc">%&gt;%</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(data_venda)</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Resultado: um relatório integrado</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(relatorio_vendas, <span class="at">n =</span> <span class="cn">Inf</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 7
+  id_venda data_venda cod_produto descricao       qtd valor_unitario valor_total
+     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;         &lt;dbl&gt;          &lt;dbl&gt;       &lt;dbl&gt;
+1        1 2025-04-15 P001        Notebook Pro      1           4500        4500
+2        2 2025-04-16 P002        Smartphone X      2           2800        5600
+3        3 2025-04-18 P003        Monitor 24pol     2           1200        2400</code></pre>
+</div>
+</div>
+<p><strong>Observação</strong>: Esta situação é extremamente comum.</p>
+</section>
+<section id="exercício-1" class="level2" data-number="1.12">
+<h2 data-number="1.12" class="anchored" data-anchor-id="exercício-1"><span class="header-section-number">1.12</span> Exercício 1</h2>
+<p>Identifique o join mais adequado para cada cenário</p>
+<p>Para cada situação abaixo, identifique qual tipo de join seria mais apropriado: <strong>left_join</strong>, <strong>inner_join</strong>, <strong>full_join</strong> ou <strong>right_join</strong>:</p>
+<ol type="1">
+<li><p>left_join</p></li>
+<li><p>righ_join</p></li>
+<li><p>full_join</p></li>
+<li><p>inner_join</p></li>
+</ol>
+<p><strong>Dica</strong>: Pense em quais tabelas são “obrigatórias” e quais são “opcionais” em cada cenário!</p>
+</section>
+<section id="exercício-2" class="level2" data-number="1.13">
+<h2 data-number="1.13" class="anchored" data-anchor-id="exercício-2"><span class="header-section-number">1.13</span> Exercício 2</h2>
+<p>Você precisa criar uma lista simples que mostre, para cada venda, o nome do produto vendido:</p>
+<ol type="1">
+<li><p>Una as tabelas de vendas e produtos</p></li>
+<li><p>Selecione apenas as colunas <code>id_venda</code>, <code>data_venda</code>, <code>nome_produto</code> e <code>quantidade</code></p></li>
+<li><p>Ordene por data_venda</p></li>
+</ol>
+<p>Complete o código:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>lista_vendas_produtos <span class="ot">&lt;-</span> vendas <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1. Escolha o tipo de join adequado para manter todas as vendas</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(produtos, <span class="at">by =</span> <span class="st">"codigo_produto"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2. Selecione apenas as colunas importantes</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    id_venda, </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    data_venda, </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    nome_produto,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    quantidade</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 3. Ordene por data da venda</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(data_venda)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>lista_vendas_produtos</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  id_venda data_venda nome_produto  quantidade
+     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;              &lt;dbl&gt;
+1        1 2025-04-15 Notebook Pro           1
+2        2 2025-04-16 Smartphone X           2
+3        3 2025-04-18 Monitor 24pol          2
+4        4 2025-04-20 Smartphone X           1
+5        5 2025-04-22 &lt;NA&gt;                   3
+6        6 2025-04-23 Mouse Gamer            4</code></pre>
+</div>
+</div>
+<p><strong>Dica</strong>: Pense em qual tipo de join deve usar. Você quer manter todas as vendas mesmo sem produto cadastrado ou apenas as vendas de produtos conhecidos?</p>
+</section>
+<section id="exercício-3" class="level2" data-number="1.14">
+<h2 data-number="1.14" class="anchored" data-anchor-id="exercício-3"><span class="header-section-number">1.14</span> Exercício 3</h2>
+<p>Crie um relatório que mostre todos os clientes, mesmo aqueles que não fizeram compras:</p>
+<ol type="1">
+<li><p>Una as tabelas de clientes e vendas de forma a manter todos os clientes</p></li>
+<li><p>Selecione as colunas <code>id_cliente</code>, <code>nome_cliente</code>, <code>cidade</code>, <code>id_venda</code> e <code>data_venda</code></p></li>
+<li><p>Ordene por nome_cliente</p></li>
+</ol>
+<p>Complete o código:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Complete o código</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>relatorio_clientes <span class="ot">&lt;-</span> clientes <span class="sc">%&gt;%</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1. Escolha o tipo de join adequado para manter todos os clientes</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(vendas, <span class="at">by =</span> <span class="st">"id_cliente"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2. Selecione apenas as colunas importantes</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    id_cliente,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    nome_cliente,</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    cidade,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    id_venda,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    data_venda</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 3. Ordene por nome do cliente</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(nome_cliente)</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>relatorio_clientes</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Dica</strong>: Como queremos manter todos os clientes, mesmo os que não fizeram compras, qual tipo de join devemos usar?</p>
+</section>
+<section id="exercício-4" class="level2" data-number="1.15">
+<h2 data-number="1.15" class="anchored" data-anchor-id="exercício-4"><span class="header-section-number">1.15</span> Exercício 4</h2>
+<ul>
+<li><p>Qual função de join e quais operações de manipulação de dados seriam necessárias para criar um relatório financeiro que mostre todas as vendas com o valor total calculado (quantidade × preço unitário), incluindo vendas de produtos que podem não estar cadastrados?</p></li>
+<li><p>O diretor financeiro solicitou um relatório simplificado que mostre o valor total de cada venda:</p></li>
+</ul>
+<p>Complete o código:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>relatorio_financeiro <span class="ot">&lt;-</span> vendas <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combine vendas com produtos usando left_join</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(produtos, <span class="at">by =</span> <span class="st">"codigo_produto"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcule o valor total da venda</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">valor_total =</span> quantidade <span class="sc">*</span> preco_unitario) <span class="sc">%&gt;%</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Selecione apenas as colunas relevantes para o relatório</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    id_venda, </span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    data_venda,</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    codigo_produto, </span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    nome_produto,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    quantidade, </span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    preco_unitario,</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    valor_total</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Ordene do maior valor total para o menor</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(valor_total))</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>relatorio_financeiro</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 7
+  id_venda data_venda codigo_produto nome_produto  quantidade preco_unitario
+     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;          &lt;chr&gt;              &lt;dbl&gt;          &lt;dbl&gt;
+1        2 2025-04-16 P002           Smartphone X           2           2800
+2        1 2025-04-15 P001           Notebook Pro           1           4500
+3        4 2025-04-20 P002           Smartphone X           1           2800
+4        3 2025-04-18 P003           Monitor 24pol          2           1200
+5        6 2025-04-23 P004           Mouse Gamer            4            250
+6        5 2025-04-22 P006           &lt;NA&gt;                   3             NA
+# ℹ 1 more variable: valor_total &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p><strong>Perguntas para reflexão:</strong></p>
+<ol type="1">
+<li>Qual foi a venda de maior valor?</li>
+<li>O que acontece com as vendas de produtos não cadastrados?</li>
+<li>Como este relatório poderia ajudar na tomada de decisões comerciais?</li>
+</ol>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copiada");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copiada");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

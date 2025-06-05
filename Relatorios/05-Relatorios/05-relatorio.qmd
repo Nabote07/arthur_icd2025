@@ -2,7 +2,7 @@
 title: "Organização de Dados com o Pacote tidyr"
 subtitle: "Disciplina: Introducão à Ciência de Dados"
 lang: pt-BR
-author: "Seu Nome"
+author: "Arthur Henrique"
 date: 2025-05-07
 format: 
   html:

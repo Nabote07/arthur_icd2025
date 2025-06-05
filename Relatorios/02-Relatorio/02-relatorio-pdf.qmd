@@ -3,19 +3,19 @@ title: "Caso Junglivet Whisky Company"
 subtitle: "Introdução à CRISP-DM, RStudio, Sistema Quarto e Linguagem R"
 lang: pt-BR
 author: "Arthur Henrique"
-date: 2025-04-02
-format: 
-  html:
-    theme: quartz
-    embed-resources: true
-    toc: true
+date: 2025-04-16
+date-format: long
+format:
+  typst:
+    columns: 1
+    toc: false
+    papersize: a4
+    fontsize: 12pt
     number-sections: true
-    code-fold: true
-    code-tools: true
 execute:
-  message: false
+  echo: false
   warning: false
-  echo: true
+  message: false
 ---
 
 
@@ -600,5 +600,7 @@ didático.
 Estas habilidades são fundamentais não apenas para projetos acadêmicos, 
 mas também para aplicações profissionais em ciência de dados e análise 
 de negócios no mundo atual da economia de dados.
+
+
 
 
