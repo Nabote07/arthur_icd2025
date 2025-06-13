@@ -22,8 +22,8 @@ Isso inclui:
 ## Estrutura do projeto (Organização das Pastas)
 
 - **dados/**
-  - **brutos/**: Arquivos de dados originais
-  - **limpos/**: Dados organizados após processamento
+- **brutos/**: Arquivos de dados originais
+- **limpos/**: Dados organizados após processamento
   
 - **relatorios/**
   - **01_relatorio/**: relatório quarto no formato html
