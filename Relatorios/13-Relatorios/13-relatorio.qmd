@@ -360,7 +360,7 @@ addmargins(tabela_contingencia)
 # Preparação dos dados para gráfico de barras agrupadas e empilhadas
 
 # Cria tabela de contingencia entre raça e signo astrológico
-tabela_bivariada <- Marriage %>% 
+tabela_contingencia <- Marriage %>% 
   # count() conta as combinações únicas de race e sign
   # sort = TRUE ordena pela frequência em ordem decrescente
   count(race, sign, sort = TRUE) 
@@ -781,13 +781,35 @@ respondentes por estado civil.
 freqüência absoluta dos estados civis (Dica: código do **slide 21**)
 
 ```{r}
-# seu código aqui
+tabela_estadocivil <- questionario %>% 
+  # conta o número de respondentes por estado_civil
+  count(estado_civil) %>% 
+  # ordena os dados pela frequência em ordem CRESCENTE (menor para maior)
+  # vamos usar ordem crescente para compensar o efeito do coord_flip()
+  arrange(n) %>%
+  # sincroniza os niveis do factor com a ordem atual das linhas
+  mutate(estado_civil = factor(estado_civil, levels = estado_civil))
+
+# exibe a tabela (dados em ordem crescente)
+tabela_estadocivil
 ```
 
 2. Crie um gráfico de barras horizontais básico:
 
 ```{r}
-# seu código aqui
+#Criando o gráfico de barras horizontais
+grafico_barras_estado_civil <- ggplot(data = tabela_estado_civil_frequencia, aes(x = frequencia, y = reorder(estado_civil, frequencia))) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "darkblue") + # 'stat="identity"' usa o valor da coluna 'frequencia' diretamente
+  labs(
+    title = "Frequência de Estados Civis",
+    x = "Frequência Absoluta",
+    y = "Estado Civil"
+  ) +
+  theme_minimal() # Um tema mais limpo para o gráfico
+
+# 3. Exibindo o gráfico
+print(grafico_barras_estado_civil)
+
 ```
 
 
@@ -799,7 +821,34 @@ freqüência absoluta dos estados civis (Dica: código do **slide 21**)
 
 
 ```{r}
-# seu código aqui
+# 2. Re-criando a tabela de exemplo para garantir que ela está no ambiente
+# (Se você já tem seus dados ou rodou o exercício anterior, pode pular este bloco 'dados <- ...')
+dados <- data.frame(
+  estado_civil = sample(c("Solteiro", "Casado", "Divorciado", "Viúvo"), 100, replace = TRUE)
+)
+tabela_estado_civil_frequencia <- dados %>%
+  count(estado_civil, sort = TRUE) %>%
+  rename(frequencia = n)
+
+# 3. Criando o gráfico de barras horizontais aprimorado
+grafico_barras_estado_civil_aprimorado <- ggplot(data = tabela_estado_civil_frequencia, aes(x = frequencia, y = reorder(estado_civil, frequencia))) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "darkblue") + # Barras
+  geom_text(aes(label = frequencia),                # Adiciona o texto com os valores da frequência
+            hjust = -0.1,                           # Ajusta a posição horizontal do texto (fora da barra, à direita)
+            size = 3.5,                             # Tamanho da fonte do texto
+            color = "black") +                      # Cor do texto
+  labs(
+    title = "Frequência de Estados Civis dos Participantes", # Título mais específico
+    x = "Frequência Absoluta",                       # Rótulo do eixo X
+    y = "Estado Civil"                               # Rótulo do eixo Y
+  ) +
+  theme_minimal() +                                  # Tema minimalista
+  # Opcional: Expandir o limite do eixo X para dar espaço para o texto
+  xlim(0, max(tabela_estado_civil_frequencia$frequencia) * 1.1)
+
+
+# 4. Exibindo o gráfico aprimorado
+print(grafico_barras_estado_civil_aprimorado)
 ```
 
 
@@ -992,8 +1041,3 @@ Para aprofundar seus conhecimentos em visualização de dados com ggplot2:
 - [Documentação oficial do ggplot2](https://ggplot2.tidyverse.org/)
 - [Data Visualization with ggplot2 Cheat Sheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
 - Livro: "ggplot2: Elegant Graphics for Data Analysis" por Hadley Wickham
-
-
-
-
-

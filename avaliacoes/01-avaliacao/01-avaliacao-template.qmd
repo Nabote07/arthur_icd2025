@@ -1,7 +1,7 @@
 ---
 title: "Resolucão da Avaliação 1"
 subtitle: "Introdução à Ciência de Dados - 2025 <br> Bacharelado em Administração"
-author: "Alexia Luisa"
+author: "Arthur Henrique"
 title-block-banner: "#27445C"
 format:
   html:
@@ -13,7 +13,7 @@ lang: "pt"
 date: 2025-05-14
 date-format: long
 execute: 
-  eval: false
+  eval: true
   echo: true
   warning: false
   message: false
