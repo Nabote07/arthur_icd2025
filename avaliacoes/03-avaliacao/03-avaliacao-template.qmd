@@ -1,0 +1,244 @@
+---
+title: "Avaliação 3 - Valor: 34 pontos"
+subtitle: "Introdução à Ciência de Dados - 2025 <br> Bacharelado em Administração"
+author:   
+  - Arthur Henrique   
+  - Alexia Luisa
+  - caroline lopes
+  - Gabriel Barbosa
+title-block-banner: "#27445C"
+format:
+  html:
+    embed-resources: true
+    page-layout: article
+    toc: true
+    toc-location: left
+lang: "pt"
+date: 2025-07-09
+date-format: long
+execute:
+  eval: true
+  echo: true
+  warning: false
+  message: false
+---
+
+
+
+```{r}
+#| label: setup
+#| echo: false
+
+# configura a exbição de números decimais
+options(digits = 3, scipen = 999)
+
+# pacotes utilizados
+library(tidyverse)
+library(ggpubr)
+```
+
+
+
+
+## Questão 1
+
+### Inferência sobre Proporções Populacionais
+
+**a)** 
+
+```{r}
+# Dados da pesquisa
+respondentes_A <- 350
+satisfeitos_A <- 273
+respondentes_B <- 290
+satisfeitos_B <- 198
+```
+
+
+```{r}
+# Estimativa pontual da proporção de clientes satisfeitos do grupo A
+prop_A_ponto <- satisfeitos_A / respondentes_A
+cat("Proporção Categoria A:", round(prop_A_ponto, 3))
+
+```
+
+
+```{r}
+# Estimativa pontual da proporção de clientes satisfeitos do grupo B
+prop_B_ponto <- satisfeitos_B / respondentes_B
+cat("Proporção Categoria B:", round(prop_B_ponto, 3))
+
+```
+
+
+```{r}
+# Estimativa pontual da diferença entre as proporções
+dif_ponto <- prop_A_ponto - prop_B_ponto
+cat("Diferença (A - B):", round(dif_ponto, 3))
+
+```
+
+
+
+
+**b)** 
+Estimativas pontuais são palpites vindos de testes e não mostram dúvida na coleta de dados. Já as  Intervalos de confiança são um conjunto de valores possíveis para toda a população e deixam as conclusões estatísticas mais confiáveis.
+
+
+
+
+**c)** 
+
+
+```{r}
+# Intervalo de confiança para a diferença entre proporções
+
+teste_prop_dif <- prop.test(x = c(satisfeitos_A, satisfeitos_B), n = c(respondentes_A, respondentes_B), conf.level = 0.95)
+
+# Exibindo o resultado do intervalo de confiança
+print(teste_prop_dif)
+```
+
+
+
+**d)** 
+
+A saída (conf.int) mostra o intervalo de confiança de 95% para a diferença observada entre as proporções (proporção de A menos a proporção de B). Se esse intervalo não incluir o valor zero, isso mostra uma diferença estatisticamente relevante entre as proporções dos dois grupos, considerando um nível de significância de 5%. Um intervalo totalmente positivo indica que a Categoria A possui uma parcela consideravelmente superior de clientes satisfeitos. Se for inteiramente negativo, o contrário disso é sugerido. A inclusão do zero nesse intervalo implica que não há indícios estatísticos fortes de uma diferença notável na proporção de clientes satisfeitos entre as duas categorias.
+
+
+**e.1)** 
+
+
+
+$$
+\begin{cases}
+H_0: p_A ≤ 0.70  \\
+H_A: p_A > 0.70
+\end{cases}
+$$
+
+
+**e.2)** 
+ 
+
+```{r}
+# Teste de hipótese unilateral para proporção da Categoria A
+
+prop_referencia <- 0.70
+teste_prop_A <- prop.test(x = satisfeitos_A, n = respondentes_A, p = prop_referencia, alternative = "greater", conf.level = 0.95)
+
+# Exibindo o resultado do teste de hipótese
+print(teste_prop_A)
+```
+
+
+
+**e.3)** 
+
+Com um valor-p de 0.0007, que é muito menor que 0.05, rejeitamos a hipótese de que a proporção de satisfeitos na Categoria A é de 70% ou menos. Há evidências estatísticas fortes de que a proporção de clientes satisfeitos na Categoria A é significativamente maior que 70%.
+
+
+## Questão 2
+
+### Inferência sobre Médias Populacionais
+
+```{r}
+# Cria a data.frame dados_entrega
+dados_entrega <- data.frame(
+  tempo = c(
+    1.9908307, 3.7595980, 3.9207872, 1.9499968, 2.5570788, 2.9083451, 
+    3.8215787, 3.4254931, 4.1066170, 3.7159112, 2.3757705, 4.3799877, 
+    4.0898537, 4.6885358, 1.9032753, 4.9526208, 4.7632426, 3.5487350, 
+    5.2520306, 4.5840950, 2.7728566, 1.6544221, 1.9158527, 3.3874123,
+    3.1677474, 4.2208561, 2.7834305, 2.9044544, 4.5360855, 2.2195599, 
+    2.7240852, 2.6655864, 1.4009759, 3.4665378, 3.3535627, 4.6972176, 
+    1.9733366, 2.5457229, 2.2336230, 2.6573906, 2.6681639, 3.1323411, 
+    2.4254247, 2.7917952, 4.9867621, 2.8329370, 2.8299644, 3.5470596, 
+    1.4070574, 3.1499424, 1.9685541, 2.4178228, 3.4466604, 3.6865291, 
+    3.3801921, 3.5045991, 2.2455080, 4.4135944, 3.2958687, 3.3348655, 
+    0.2198195, 1.6197339, 2.4793752, 3.6855232, 2.6521006, 4.5120387, 
+    4.4196294, 1.1254838, 2.1009464, 1.8516211, 2.5130132, 2.6551619, 
+    0.8074057, 4.2885169, 2.6779839
+  ),
+  parceiro = c(
+    rep("Atual", 35),
+    rep("Novo", 40)
+  )
+)
+```
+
+
+
+**a)** 
+
+
+```{r}
+# Gráfico quantile-quantile para verificar normalidade dos dados
+grafico_qq <- ggqqplot(dados_entrega, x = "tempo", color = "parceiro") +
+  labs(title = "Gráfico Quantil-Quantil dos Tempos de Entrega por Parceiro",
+       color = "Parceiro",
+       x = "Quantis Teóricos (Normal Padrão)",
+       y = "Quantis Observados (Tempo de Entrega)")
+
+print(grafico_qq)
+```
+
+
+
+
+**b)**
+
+
+```{r}
+# Estimativa por intervalo de confiança para a diferença entre médias 
+
+teste_t <- t.test(tempo ~ parceiro, data = dados_entrega, conf.level = 0.95)
+
+print(teste_t)
+```
+
+
+
+
+**c)** 
+```{r}
+# Dados
+media_atual <- 3.31
+media_novo <- 2.83
+```
+
+
+```{r}
+# Atual
+cat("Tempo médio para Parceiro Atual:", media_atual)
+
+```
+
+
+```{r}
+# Novo
+cat("Tempo médio para Parceiro Novo:", media_novo)
+
+```
+
+
+```{r}
+# Estimativa pontual da diferença entre os tempos médios
+diferenca_medias <- media_atual - media_novo
+
+cat("Diferença entre os tempos médios de entrega (Atual - Novo):", diferenca_medias)
+
+```
+
+**d)** 
+
+A intervalo de confiança de 95% aponta que a variação entre as médias de tempo de entrega (Atual menos Novo) fica entre -0,000512 e 0,962466 dias. Dado que esse intervalo inclui zero, não podemos afirmar, com certeza estatística de 5%, que um dos parceiros leva, em média, mais tempo para entregar do que o outro. Ao incluir o zero nessa faixa, quer dizer que é possível que a diferença real entre os tempos médios de entrega seja nula, ou seja, que não existe diferença significativa entre eles.
+
+
+
+
+
+
+
+
+

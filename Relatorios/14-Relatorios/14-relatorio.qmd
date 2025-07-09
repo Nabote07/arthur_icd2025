@@ -449,7 +449,13 @@ extraindo uma amostra aléatoria simples com a função 'slice_sample' do dplyer
 set.seed(234)
 
 #extrai AAS dos municipios
-amostra_aleatorioa_simples <- dados_recentes 
+amostra_aleatorioa_simples <- dados_recentes %>%
+  slice_sample( n = 150 ) %>%
+  select(ufn, pop, idhm)
+  
+  
+#exibe a amostra
+amostra_aleatorioa_simples
 ```
 
 

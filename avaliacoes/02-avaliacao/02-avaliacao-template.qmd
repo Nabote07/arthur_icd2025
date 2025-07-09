@@ -391,7 +391,7 @@ print(as.data.frame(lapply(resultados_analise, function(x) round(x, 4))))
 
 **Interpretação:**
 
-Retornos Individuais (PETR4.SA e WEGE3.SA): A análise dos mínimos, máximos e médias dos retornos nos mostra a faixa de variação diária e o desempenho médio de cada ação no período. Por exemplo, a PETR4.SA teve um retorno diário médio de -4e-04, com variações extremas entre 0.0958 e 0.0701.
+Retornos Individuais (PETR4.SA e WEGE3.SA): A análise dos mínimos, máximos e médias dos retornos nos mostra a faixa de variação diária e o desempenho médio de cada ação no período. Por exemplo, a PETR4.SA teve um retorno diário médio de -4e-04, com variações extremas entre 0.0958 e 0.0701 .
 
 Correlação (PETR4.SA e WEGE3.SA): A correlação de 0.1371 entre PETR4.SA e WEGE3.SA indica uma relação positiva. Isso significa que, na maior parte do tempo, quando o retorno de uma ação sobe, a outra também tende a subir, e vice-versa.
 
